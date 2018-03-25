@@ -11,13 +11,14 @@ const scene = [
   new PointLight(new Vector(0, 0, -400)),
 ];
 
+let statusElement = null;
 documentReady(() => {
-  console.log('Tracer');
   const canvas = document.createElement('canvas');
-  canvas.width = 800;
+  canvas.width = window.innerWidth * .9;
   canvas.height = canvas.width / 16 * 9;
   document.body.appendChild(canvas);
-  window.render = render;
+  statusElement = document.createElement('div');
+  document.body.appendChild(statusElement);
 
   for (let x = -400; x <= 400; x += 400) {
     for (let y = -400; y <= 400; y += 400) {
@@ -26,13 +27,11 @@ documentReady(() => {
           new Sphere(new Vector(x, y, z),
             100,
             {color: new Color(Math.random(), Math.random(), Math.random(), 1),
-              reflection: .3, diffuse: .8}),
+              reflection: .8, diffuse: .9}),
         );
       }
     }
   }
-
-  console.log(scene.length);
 
   render();
 });
@@ -109,8 +108,13 @@ function raytrace (scene, params) {
   return params;
 }
 
+function setStatus (text) {
+  statusElement.innerHTML = text;
+}
+
 function render () {
-  console.time('render');
+  setStatus('Rendering scene...');
+  const start = performance.now();
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('2d');
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -143,5 +147,6 @@ function render () {
 
   imageData.data.set(buffer8);
   context.putImageData(imageData, 0, 0);
-  console.timeEnd('render');
+  const end = performance.now();
+  setStatus(`Tracing ${w * h} rays took ${Math.round(end - start)}ms`);
 }
