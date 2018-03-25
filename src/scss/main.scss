@@ -1,0 +1,69 @@
+@import 'variables';
+@import 'typography';
+@import 'mixins';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: $color-white;
+  color: $color-black;
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+img {
+  width: 100%;
+
+  &[data-src] {
+    opacity: 0;
+    transition: 500ms opacity ease-in-out;
+
+    &.akm-lazy-loaded {
+      opacity: 1;
+    }
+  }
+}
+
+button {
+  border: 1px solid $color-black;
+  padding: $grid-size 3 * $grid-size;
+  outline: none;
+  cursor: pointer;
+}
+
+.akm-appear {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: none $transition-medium ease-in-out;
+  transition-property: opacity, transform;
+
+  &.akm-appear-appearing,
+  &.akm-appear-appeared {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.akm-hidden {
+  display: none;
+}
+
+.akm-only-desktop {
+  @media screen and (max-width: $break-mobile) {
+    display: none;
+  }
+}
+
+.akm-only-mobile {
+  @media screen and (min-width: $break-mobile + 1) {
+    display: none;
+  }
+}
