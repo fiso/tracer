@@ -1,0 +1,74 @@
+import {TraceResult} from '../raytracer';
+
+export function Sphere (center, radius, material) {
+  this.type = 'sphere';
+  this.center = center;
+  this.radius = radius;
+  this.material = material;
+}
+
+Sphere.prototype.getNormal = function (p) {
+  return p.subtract(this.center).unit();
+};
+
+Sphere.prototype.intersect = function (ray, distance) {
+  const localRayOrigin = ray.origin.subtract(this.center);
+
+  // Compute A, B and C coefficients
+  const a = ray.direction.dot(ray.direction);
+  const b = 2 * ray.direction.dot(localRayOrigin);
+  const c = localRayOrigin.dot(localRayOrigin) -
+  this.radius * this.radius;
+
+  // Find discriminant
+  const disc = b * b - 4 * a * c;
+
+  // if discriminant is negative there are no real roots, so return
+  // false as ray misses sphere
+  if (disc < 0) {
+    return {result: TraceResult.TR_MISS};
+  }
+
+  // compute q as described above
+  const distSqrt = Math.sqrt(disc);
+  let q = 0;
+  if (b < 0) {
+    q = (-b - distSqrt) / 2;
+  } else {
+    q = (-b + distSqrt) / 2;
+  }
+
+  // compute t0 and t1
+  let t0 = q / a;
+  let t1 = c / q;
+
+  // make sure t0 is smaller than t1
+  if (t0 > t1) {
+    // if t0 is bigger than t1 swap them around
+    const temp = t0;
+    t0 = t1;
+    t1 = temp;
+  }
+
+  // if t1 is less than zero, the object is in the ray's negative direction
+  // and consequently the ray misses the sphere
+  if (t1 < 0) {
+    return {result: TraceResult.TR_MISS};
+  }
+
+  // if t0 is less than zero, the intersection point is at t1
+  if (t0 < 0) {
+    if (t1 < distance) {
+      return {result: TraceResult.TR_HIT, distance: t1};
+    } else {
+      return {result: TraceResult.TR_MISS};
+    }
+  } else {
+    // else the intersection point is at t0
+    if (t0 < distance) {
+      return {result: TraceResult.TR_HIT, distance: t0};
+    } else {
+      return {result: TraceResult.TR_MISS};
+    }
+  }
+};
