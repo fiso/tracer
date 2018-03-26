@@ -22,7 +22,7 @@ documentReady(() => {
 
   for (let x = -400; x <= 400; x += 400) {
     for (let y = -400; y <= 400; y += 400) {
-      for (let z = 200; z <= 1000; z += 400) {
+      for (let z = 0; z <= 800; z += 400) {
         scene.push(
           new Sphere(new Vector(x, y, z),
             100,
@@ -85,10 +85,11 @@ function raytrace (scene, params) {
   const EPSILON = .0001;
 
   if (hit.material.reflection > 0) {
-    const normal = hit.getNormal(pi);
-    const rayDotN2 = params.ray.direction.dot(normal) * 2;
-    const r = params.ray.direction.subtract(normal.multiply(rayDotN2));
     if (params.depth < params.maxTraceDepth) {
+      const normal = hit.getNormal(pi);
+      const rayDotN2 = params.ray.direction.dot(normal) * 2;
+      const r = params.ray.direction.subtract(normal.multiply(rayDotN2));
+
       const reflectionTrace = raytrace(scene, {
         ray: {
           origin: pi.add(r.multiply(EPSILON)),
@@ -99,6 +100,8 @@ function raytrace (scene, params) {
         depth: params.depth + 1,
         distance: Number.MAX_SAFE_INTEGER,
       });
+
+      params.depth = reflectionTrace.depth;
       params.color = params.color.add(
         hit.material.color.multiply(reflectionTrace.color)
         .multiply(hit.material.reflection));
@@ -122,7 +125,7 @@ function render () {
   const buffer8 = new Uint8ClampedArray(buffer);
   const data = new Uint32Array(buffer);
 
-  const aperture = 300;
+  const aperture = 800;
   const origin = new Vector(0, 0, -aperture);
 
   const w = canvas.width;
@@ -134,14 +137,16 @@ function render () {
         .subtract(origin)
         .unit();
 
-      data[y * canvas.width + x] = raytrace(scene, {
+      const result = raytrace(scene, {
         ray: {
           origin, direction,
         },
         maxTraceDepth: 5,
         color: bgColor,
         depth: 1,
-        distance: Number.MAX_SAFE_INTEGER}).color.hex();
+        distance: Number.MAX_SAFE_INTEGER});
+
+      data[y * canvas.width + x] = result.color.hex();
     }
   }
 
