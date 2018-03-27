@@ -171,7 +171,4 @@ function render (rotation) {
   context.putImageData(imageData, 0, 0);
   const end = performance.now();
   setStatus(`Tracing ${w * h} rays took ${Math.round(end - start)}ms`);
-  setTimeout(() => {
-    render(rotation + .1);
-  }, 10);
 }
