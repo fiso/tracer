@@ -72,3 +72,25 @@ Sphere.prototype.intersect = function (ray, distance) {
     }
   }
 };
+
+/* eslint-disable */
+/*
+
+TODO: review this code and see if it's faster / better
+
+Raytracer.hitTestSphere = function(origin, ray, center, radius) {
+  var offset = origin.subtract(center);
+  var a = ray.dot(ray);
+  var b = 2 * ray.dot(offset);
+  var c = offset.dot(offset) - radius * radius;
+  var discriminant = b * b - 4 * a * c;
+
+  if (discriminant > 0) {
+    var t = (-b - Math.sqrt(discriminant)) / (2 * a), hit = origin.add(ray.multiply(t));
+    return new HitTest(t, hit, hit.subtract(center).divide(radius));
+  }
+
+  return null;
+};
+
+*/

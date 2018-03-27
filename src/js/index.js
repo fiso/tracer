@@ -4,6 +4,7 @@ import {Vector} from './vector';
 import {Color} from './color';
 import {PointLight} from './lights';
 import {Sphere} from './primitives/sphere';
+import {Triangle} from './primitives/triangle';
 import {TraceResult} from './raytracer';
 import '../scss/main.scss';
 
@@ -33,7 +34,12 @@ documentReady(() => {
     }
   }
 
-  render();
+  window.render = render;
+  window.scene = scene;
+  setStatus('Rendering scene...');
+  setTimeout(() => {
+    render(0);
+  }, 100);
 });
 
 const bgColor = new Color(0, 0, 0, 1);
@@ -115,8 +121,19 @@ function setStatus (text) {
   statusElement.innerHTML = text;
 }
 
-function render () {
-  setStatus('Rendering scene...');
+function render (rotation) {
+  const thisScene = scene.slice();
+  const r = 800;
+  const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
+    rotation + Math.PI * 2 / 3];
+  thisScene.push(new Triangle(
+    new Vector(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 1000),
+    new Vector(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 1000),
+    new Vector(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 1000),
+    {color: new Color(1, 0, 1, 1),
+      reflection: .8, diffuse: .9}
+    ));
+
   const start = performance.now();
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('2d');
@@ -137,7 +154,7 @@ function render () {
         .subtract(origin)
         .unit();
 
-      const result = raytrace(scene, {
+      const result = raytrace(thisScene, {
         ray: {
           origin, direction,
         },
@@ -154,4 +171,7 @@ function render () {
   context.putImageData(imageData, 0, 0);
   const end = performance.now();
   setStatus(`Tracing ${w * h} rays took ${Math.round(end - start)}ms`);
+  setTimeout(() => {
+    render(rotation + .1);
+  }, 10);
 }
