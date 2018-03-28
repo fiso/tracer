@@ -1,7 +1,7 @@
 import {elementInView} from './viewportHandler';
 import {querySelectorAllCached} from './akademi';
 
-let lazyCache = {};
+const lazyCache = {};
 let lazyCacheList = [];
 let imgElements = null;
 let allLoaded = false;

@@ -52,7 +52,7 @@ export function elementInView (el, bufferZone) {
   );
 }
 
-let appearCache = {};
+const appearCache = {};
 function updateAppear () {
   const appearElements = querySelectorAllCached('.akm-appear');
   for (let i = 0; i < appearElements.length; i++) {
