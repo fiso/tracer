@@ -1,21 +1,38 @@
-Raytracer.hitTestBox = function(origin, ray, min, max) {
-  var tMin = min.subtract(origin).divide(ray);
-  var tMax = max.subtract(origin).divide(ray);
-  var t1 = Vector.min(tMin, tMax);
-  var t2 = Vector.max(tMin, tMax);
-  var tNear = t1.max();
-  var tFar = t2.min();
+import {TraceResult} from '../raytracer';
+import {Vector} from '../vector';
+
+export function Cube (center, radius, material) {
+  this.type = 'cube';
+  this.center = center;
+  this.radius = radius;
+  this.material = material;
+}
+
+Cube.prototype.getNormal = function (p) {
+  const min = this.center.subtract(this.radius);
+  const max = this.center.add(this.radius);
+  return new Vector(
+    (p.x >= max.x) - (p.x <= min.x),
+    (p.y >= max.y) - (p.y <= min.y),
+    (p.z >= max.z) - (p.z <= min.z)
+  );
+};
+
+Cube.prototype.intersect = function (ray, distance) {
+  const min = this.center.subtract(this.radius);
+  const max = this.center.add(this.radius);
+  const tMin = min.subtract(ray.origin).divide(ray.direction);
+  const tMax = max.subtract(ray.origin).divide(ray.direction);
+  const t1 = Vector.min(tMin, tMax);
+  const t2 = Vector.max(tMin, tMax);
+  const tNear = t1.max();
+  const tFar = t2.min();
 
   if (tNear > 0 && tNear < tFar) {
-    var epsilon = 1.0e-6, hit = origin.add(ray.multiply(tNear));
-    min = min.add(epsilon);
-    max = max.subtract(epsilon);
-    return new HitTest(tNear, hit, new Vector(
-      (hit.x > max.x) - (hit.x < min.x),
-      (hit.y > max.y) - (hit.y < min.y),
-      (hit.z > max.z) - (hit.z < min.z)
-    ));
+    if (tNear < distance) {
+      return {result: TraceResult.TR_HIT, distance: tNear};
+    }
   }
 
-  return null;
+  return {result: TraceResult.TR_MISS};
 };
