@@ -17,6 +17,6 @@ Material.prototype.getColormapPixel = function (u, v) {
   const x = u * this.colorMap.w;
   const y = v * this.colorMap.h;
   const pixel = this.colorMap.data[
-    this.colorMap.w * Math.round(x) + Math.round(y)];
+    this.colorMap.w * Math.round(y) + Math.round(x)];
   return Color.from(pixel);
 };

@@ -22,7 +22,7 @@ documentReady(async () => {
   statusElement = document.createElement('div');
   document.body.appendChild(statusElement);
 
-  render(await constructScene());
+  render(await constructScene(Math.PI / 2));
 });
 
 window.constructScene = constructScene;
@@ -52,8 +52,8 @@ async function constructScene (rotation = 0) {
   const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
     rotation + Math.PI * 2 / 3];
   scene.renderables.push(new Triangle(
-    new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: 1, v: 1}),
-    new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 0, v: 1}),
+    new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: .5, v: 1}),
+    new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 1, v: 0}),
     new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 100, {u: 0, v: 0}),
     new Material({
       color: new Color(.7, 0, .6, 1),
