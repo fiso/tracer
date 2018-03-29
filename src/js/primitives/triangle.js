@@ -1,7 +1,7 @@
 import {TraceResult} from '../raytracer';
+import {Vector} from '../vector';
 
 export function Triangle (a, b, c, material) {
-  this.type = 'sphere';
   this.a = a;
   this.b = b;
   this.c = c;
@@ -13,6 +13,37 @@ export function Triangle (a, b, c, material) {
 
 Triangle.prototype.getNormal = function (p) {
   return this.normal;
+};
+
+function sortBy (array, field) {
+  return array.sort((a, b) => {
+    if (a[field] < b[field]) {
+      return -1;
+    }
+    if (a[field] > b[field]) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
+Triangle.prototype.getUV = function (p) {
+  const xSort = sortBy([this.a, this.b, this.c], 'x');
+  const left = xSort[0];
+  const right = xSort[2];
+  const ySort = sortBy([this.a, this.b, this.c], 'y');
+  const top = xSort[0];
+  const bottom = ySort[2];
+  const width = right.x - left.x;
+  const height = bottom.y - top.y;
+  const relativePoint = p.subtract(new Vector(left.x, top.y, 0));
+  const du = right.u - left.u;
+  const dv = bottom.v - top.v;
+
+  return {
+    u: left.u + relativePoint.x / width * du,
+    v: top.v + relativePoint.y / height * dv,
+  };
 };
 
 Triangle.prototype.intersect = function (ray, distance) {
@@ -34,7 +65,10 @@ Triangle.prototype.intersect = function (ray, distance) {
     const v = (dot00 * dot12 - dot01 * dot02) / divide;
     if (u >= 0 && v >= 0 && u + v <= 1) {
       if (t < distance) {
-        return {result: TraceResult.TR_HIT, distance: t};
+        const pi = ray.origin.add(ray.direction.multiply(t));
+        const uv = this.getUV(pi);
+        return {result: TraceResult.TR_HIT, distance: t, normal,
+          u: uv.u, v: uv.v};
       }
     }
   }

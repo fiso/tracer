@@ -9,6 +9,15 @@ export function Color (r, g, b, a) {
   this.a = cap(a);
 }
 
+Color.from = function (c) {
+  return new Color(
+    (c & 0xff) / 255,
+    (c >> 8 & 0xff) / 255,
+    (c >> 16 & 0xff) / 255,
+    1,
+  );
+};
+
 Color.prototype.hex = function () {
   return 255 * this.a << 24 |
          255 * this.b << 16 |

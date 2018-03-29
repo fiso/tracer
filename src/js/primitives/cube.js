@@ -2,7 +2,6 @@ import {TraceResult} from '../raytracer';
 import {Vector} from '../vector';
 
 export function Cube (center, radius, material) {
-  this.type = 'cube';
   this.center = center;
   this.radius = radius;
   this.material = material;
@@ -30,7 +29,9 @@ Cube.prototype.intersect = function (ray, distance) {
 
   if (tNear > 0 && tNear < tFar) {
     if (tNear < distance) {
-      return {result: TraceResult.TR_HIT, distance: tNear};
+      const pi = ray.origin.add(ray.direction.multiply(tNear));
+      return {result: TraceResult.TR_HIT, distance: tNear,
+        normal: this.getNormal(pi)};
     }
   }
 

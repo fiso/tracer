@@ -1,7 +1,6 @@
 import {TraceResult} from '../raytracer';
 
 export function Sphere (center, radius, material) {
-  this.type = 'sphere';
   this.center = center;
   this.radius = radius;
   this.material = material;
@@ -17,8 +16,7 @@ Sphere.prototype.intersect = function (ray, distance) {
   // Compute A, B and C coefficients
   const a = ray.direction.dot(ray.direction);
   const b = 2 * ray.direction.dot(localRayOrigin);
-  const c = localRayOrigin.dot(localRayOrigin) -
-  this.radius * this.radius;
+  const c = localRayOrigin.dot(localRayOrigin) - this.radius * this.radius;
 
   // Find discriminant
   const disc = b * b - 4 * a * c;
@@ -59,14 +57,18 @@ Sphere.prototype.intersect = function (ray, distance) {
   // if t0 is less than zero, the intersection point is at t1
   if (t0 < 0) {
     if (t1 < distance) {
-      return {result: TraceResult.TR_HIT, distance: t1};
+      const pi = ray.origin.add(ray.direction.multiply(t1));
+      return {result: TraceResult.TR_HIT, distance: t1,
+        normal: this.getNormal(pi)};
     } else {
       return {result: TraceResult.TR_MISS};
     }
   } else {
     // else the intersection point is at t0
     if (t0 < distance) {
-      return {result: TraceResult.TR_HIT, distance: t0};
+      const pi = ray.origin.add(ray.direction.multiply(t0));
+      return {result: TraceResult.TR_HIT, distance: t0,
+        normal: this.getNormal(pi)};
     } else {
       return {result: TraceResult.TR_MISS};
     }
@@ -74,6 +76,7 @@ Sphere.prototype.intersect = function (ray, distance) {
 };
 
 /* eslint-disable */
+
 /*
 
 TODO: review this code and see if it's faster / better

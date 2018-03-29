@@ -1,10 +1,12 @@
 import RenderWorker from './render.worker.js';
+import {Texture} from './texture';
 import {documentReady} from './akademi';
+import 'babel-polyfill';
 import '../scss/main.scss';
 
 let statusElement = null;
 
-documentReady(() => {
+documentReady(async () => {
   const canvas = document.createElement('canvas');
   canvas.width = window.innerWidth * .7;
   canvas.height = canvas.width / 16 * 9;
@@ -12,8 +14,18 @@ documentReady(() => {
   statusElement = document.createElement('div');
   document.body.appendChild(statusElement);
 
-  render();
+  const textures = await preloadTextures(['/img/horsey.jpg']);
+  render(textures);
 });
+
+function preloadTextures (sources) {
+  return new Promise(async (resolve, reject) => {
+    resolve(await Promise.all(sources.map((src) => {
+      const t = new Texture(src);
+      return t.loading;
+    })));
+  });
+}
 
 function getContext () {
   return document.querySelector('canvas').getContext('2d');
@@ -25,7 +37,7 @@ function setStatus (text) {
 
 const frames = [];
 
-function render (rotation = 0) {
+function render (textures) {
   const nThreads = navigator.hardwareConcurrency;
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('2d');
@@ -51,6 +63,7 @@ function render (rotation = 0) {
 
     worker.postMessage({
       command: 'render',
+      textures,
       region: {
         left: 0,
         top: Math.floor(i * (h / nThreads)),
