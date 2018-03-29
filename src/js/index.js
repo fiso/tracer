@@ -16,7 +16,7 @@ let statusElement = null;
 
 documentReady(async () => {
   const canvas = document.createElement('canvas');
-  canvas.width = window.innerWidth * .7;
+  canvas.width = window.innerWidth - 100;
   canvas.height = canvas.width / 16 * 9;
   document.body.appendChild(canvas);
   statusElement = document.createElement('div');
@@ -26,7 +26,10 @@ documentReady(async () => {
   render(scene);
 });
 
-async function constructScene () {
+window.constructScene = constructScene;
+window.render = render;
+
+async function constructScene (rotation = 0) {
   const scene = new Scene();
   scene.textures = await preloadTextures(['/img/horsey.jpg']);
   scene.lights.push(new PointLight(new Vector(400, 0, -800)));
@@ -47,8 +50,8 @@ async function constructScene () {
     }
   }
   const r = 800;
-  const rot = .8;
-  const R = [rot, rot + Math.PI * 2 / 3 * 2, rot + Math.PI * 2 / 3];
+  const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
+    rotation + Math.PI * 2 / 3];
   scene.renderables.push(new Triangle(
     new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 1000, {u: 1, v: 1}),
     new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 1000, {u: 0, v: 1}),
@@ -101,7 +104,8 @@ function render (scene) {
         event.data.region.top);
       nCompleted++;
       if (nCompleted === nThreads) {
-        setStatus(`Tracing ${w * h} rays took ${Math.round(end - start)}ms`);
+        canvas.style.opacity = 1;
+        setStatus(`${Math.round(end - start)} ms`);
       }
       frames.push(frame);
     });
@@ -109,7 +113,6 @@ function render (scene) {
     worker.postMessage({
       command: 'render',
       scene,
-      textures: scene.textures,
       region: {
         left: 0,
         top: Math.floor(i * (h / nThreads)),
@@ -119,11 +122,8 @@ function render (scene) {
       full: {
         w, h,
       },
-    });
-    // }, [textures]); TODO: Transfer ownership of huge buffers
+    }); // , scene.textures.map((t) => t.data.buffer)
   }
-
-  console.log('All queued up');
 }
 
 function preRender () {
@@ -138,7 +138,6 @@ function preRender () {
 window.preRender = preRender;
 window.play = play;
 window.frames = frames;
-window.render = render;
 
 function play () {
   const context = getContext();

@@ -8,13 +8,12 @@ const EPSILON = .0001;
 onmessage = function (e) {
   if (e.data.command === 'render') {
     const scene = Scene.deserialize(e.data.scene);
+    scene.clearColor = new Color(0, 0, 0, 1);
     render(scene, e.data.region, e.data.full);
   }
 };
 
-const bgColor = new Color(0, 0, 0, 1);
-
-function traceDistance (scene, ray) {
+function traceDepth (scene, ray) {
   for (const object of scene.renderables) {
     const intersection = object.intersect(ray, Number.MAX_SAFE_INTEGER);
     if (intersection.result === TraceResult.TR_HIT) {
@@ -52,7 +51,7 @@ function raytrace (scene, params) {
     params.ray.direction.multiply(params.distance));
   let pointLit = false;
   for (const light of scene.lights) {
-    const d = traceDistance(scene, {
+    const d = traceDepth(scene, {
       origin: light.center,
       direction: pi.subtract(light.center).unit(),
     });
@@ -90,7 +89,7 @@ function raytrace (scene, params) {
           direction: r,
         },
         maxTraceDepth: params.maxTraceDepth,
-        color: bgColor,
+        color: scene.clearColor,
         depth: params.depth + 1,
         distance: Number.MAX_SAFE_INTEGER,
       });
@@ -125,7 +124,7 @@ function render (scene, region, full) {
           origin, direction,
         },
         maxTraceDepth: 5,
-        color: bgColor,
+        color: scene.clearColor,
         depth: 1,
         distance: Number.MAX_SAFE_INTEGER});
 
@@ -133,5 +132,5 @@ function render (scene, region, full) {
         result.color.hex();
     }
   }
-  postMessage({frame: buffer, region});
+  postMessage({frame: buffer, region}, [buffer]);
 }
