@@ -1,6 +1,7 @@
 // https://evanw.github.io/lightgl.js/docs/vector.html
 
 export function Vector (x, y, z) {
+  this.__typeOf = 'Vector';
   this.x = x || 0;
   this.y = y || 0;
   this.z = z || 0;

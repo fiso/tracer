@@ -1,10 +1,17 @@
 import {TraceResult} from '../raytracer';
 
 export function Sphere (center, radius, material) {
+  this.__typeOf = this.constructor.name;
   this.center = center;
   this.radius = radius;
   this.material = material;
 }
+
+Sphere.prototype.thaw = function (prototypeLookup) {
+  Object.setPrototypeOf(this.center, prototypeLookup.Vector);
+  Object.setPrototypeOf(this.material, prototypeLookup.Material);
+  this.material.thaw(prototypeLookup);
+};
 
 Sphere.prototype.getNormal = function (p) {
   return p.subtract(this.center).unit();

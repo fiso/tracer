@@ -1,4 +1,5 @@
 export function Texture (src) {
+  this.__typeOf = this.constructor.name;
   const img = new Image();
   img.src = src;
   this.loading = new Promise((resolve, reject) => {

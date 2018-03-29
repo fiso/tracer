@@ -1,55 +1,13 @@
 import {Vector} from './vector';
-import {Vertex} from './vertex';
+import {Scene} from './scene';
 import {Color} from './color';
-import {PointLight} from './lights';
-import {Sphere} from './primitives/sphere';
-import {Triangle} from './primitives/triangle';
 import {TraceResult} from './raytracer';
-import {Material} from './material';
 
 const EPSILON = .0001;
 
 onmessage = function (e) {
   if (e.data.command === 'render') {
-    const scene = {
-      lights: [
-        new PointLight(new Vector(400, 0, -800)),
-        new PointLight(new Vector(-400, 0, -800)),
-      ],
-      renderables: [],
-    };
-
-    for (let x = -400; x <= 400; x += 400) {
-      for (let y = -400; y <= 400; y += 400) {
-        for (let z = 0; z <= 800; z += 400) {
-          scene.renderables.push(
-            new Sphere(new Vector(x, y, z), 100,
-              new Material({
-                color: new Color(.7, .85, .6, 1),
-                reflectivity: .8,
-                diffuse: .6,
-              })
-            )
-          );
-        }
-      }
-    }
-
-    const r = 800;
-    const rot = .5;
-    const R = [rot, rot + Math.PI * 2 / 3 * 2, rot + Math.PI * 2 / 3];
-    scene.renderables.push(new Triangle(
-      new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 1000, {u: 1, v: 1}),
-      new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 1000, {u: 0, v: 1}),
-      new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 1000, {u: 0, v: 0}),
-      new Material({
-        color: new Color(.7, 0, .6, 1),
-        reflectivity: .8,
-        diffuse: .5,
-        colorMap: e.data.textures[0],
-      })
-    ));
-
+    const scene = Scene.deserialize(e.data.scene);
     render(scene, e.data.region, e.data.full);
   }
 };
@@ -107,7 +65,7 @@ function raytrace (scene, params) {
       const dot = hitNormal.dot(lightVec);
       if (dot > 0) {
         const diff = dot * hit.material.diffuse;
-        if (uv.u) {
+        if (hit.material.colorMap) {
           params.color = params.color.add(
             hit.material.getColormapPixel(uv.u, uv.v)
             .multiply(light.color).multiply(diff)

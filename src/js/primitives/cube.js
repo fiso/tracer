@@ -2,10 +2,17 @@ import {TraceResult} from '../raytracer';
 import {Vector} from '../vector';
 
 export function Cube (center, radius, material) {
+  this.__typeOf = this.constructor.name;
   this.center = center;
   this.radius = radius;
   this.material = material;
 }
+
+Cube.prototype.thaw = function (prototypeLookup) {
+  Object.setPrototypeOf(this.center, prototypeLookup.Vector);
+  Object.setPrototypeOf(this.material, prototypeLookup.Material);
+  this.material.thaw(prototypeLookup);
+};
 
 Cube.prototype.getNormal = function (p) {
   const min = this.center.subtract(this.radius);

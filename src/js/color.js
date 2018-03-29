@@ -3,6 +3,7 @@ function cap (n) {
 }
 
 export function Color (r, g, b, a) {
+  this.__typeOf = this.constructor.name;
   this.r = cap(r);
   this.g = cap(g);
   this.b = cap(b);

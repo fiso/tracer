@@ -2,14 +2,24 @@ import {TraceResult} from '../raytracer';
 import {Vector} from '../vector';
 
 export function Triangle (a, b, c, material) {
+  this.__typeOf = this.constructor.name;
   this.a = a;
   this.b = b;
   this.c = c;
-  this.material = material;
   const ab = this.b.subtract(this.a);
   const ac = this.c.subtract(this.a);
   this.normal = ab.cross(ac).unit();
+  this.material = material;
 }
+
+Triangle.prototype.thaw = function (prototypeLookup) {
+  Object.setPrototypeOf(this.a, prototypeLookup[this.a.__typeOf]);
+  Object.setPrototypeOf(this.b, prototypeLookup[this.b.__typeOf]);
+  Object.setPrototypeOf(this.c, prototypeLookup[this.c.__typeOf]);
+  Object.setPrototypeOf(this.normal, prototypeLookup.Vector);
+  Object.setPrototypeOf(this.material, prototypeLookup.Material);
+  this.material.thaw(prototypeLookup);
+};
 
 Triangle.prototype.getNormal = function (p) {
   return this.normal;

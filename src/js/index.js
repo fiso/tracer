@@ -1,5 +1,13 @@
 import RenderWorker from './render.worker.js';
+import {Color} from './color';
 import {Texture} from './texture';
+import {Sphere} from './primitives/sphere';
+import {Vertex} from './vertex';
+import {Triangle} from './primitives/triangle';
+import {Material} from './material';
+import {Scene} from './scene';
+import {Vector} from './vector';
+import {PointLight} from './lights';
 import {documentReady} from './akademi';
 import 'babel-polyfill';
 import '../scss/main.scss';
@@ -14,9 +22,46 @@ documentReady(async () => {
   statusElement = document.createElement('div');
   document.body.appendChild(statusElement);
 
-  const textures = await preloadTextures(['/img/horsey.jpg']);
-  render(textures);
+  const scene = await constructScene();
+  render(scene);
 });
+
+async function constructScene () {
+  const scene = new Scene();
+  scene.textures = await preloadTextures(['/img/horsey.jpg']);
+  scene.lights.push(new PointLight(new Vector(400, 0, -800)));
+  scene.lights.push(new PointLight(new Vector(-400, 0, -800)));
+  for (let x = -400; x <= 400; x += 400) {
+    for (let y = -400; y <= 400; y += 800) {
+      for (let z = 0; z <= 800; z += 400) {
+        scene.renderables.push(
+          new Sphere(new Vector(x, y, z), 100,
+            new Material({
+              color: new Color(Math.random(), Math.random(), Math.random(), 1),
+              reflectivity: .8,
+              diffuse: .6,
+            })
+          )
+        );
+      }
+    }
+  }
+  const r = 800;
+  const rot = .8;
+  const R = [rot, rot + Math.PI * 2 / 3 * 2, rot + Math.PI * 2 / 3];
+  scene.renderables.push(new Triangle(
+    new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 1000, {u: 1, v: 1}),
+    new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 1000, {u: 0, v: 1}),
+    new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 1000, {u: 0, v: 0}),
+    new Material({
+      color: new Color(.7, 0, .6, 1),
+      reflectivity: .8,
+      diffuse: .5,
+      colorMap: scene.textures[0],
+    })
+  ));
+  return scene;
+}
 
 function preloadTextures (sources) {
   return new Promise(async (resolve, reject) => {
@@ -37,7 +82,7 @@ function setStatus (text) {
 
 const frames = [];
 
-function render (textures) {
+function render (scene) {
   const nThreads = navigator.hardwareConcurrency;
   const canvas = document.querySelector('canvas');
   const context = canvas.getContext('2d');
@@ -63,7 +108,8 @@ function render (textures) {
 
     worker.postMessage({
       command: 'render',
-      textures,
+      scene,
+      textures: scene.textures,
       region: {
         left: 0,
         top: Math.floor(i * (h / nThreads)),
@@ -74,6 +120,7 @@ function render (textures) {
         w, h,
       },
     });
+    // }, [textures]); TODO: Transfer ownership of huge buffers
   }
 
   console.log('All queued up');
