@@ -9,7 +9,7 @@ onmessage = function (e) {
   if (e.data.command === 'render') {
     const scene = Scene.deserialize(e.data.scene);
     scene.clearColor = new Color(0, 0, 0, 1);
-    render(scene, e.data.region, e.data.full);
+    render(scene, e.data.region, e.data.full, e.data.id);
   }
 };
 
@@ -104,13 +104,15 @@ function raytrace (scene, params) {
   return params;
 }
 
-function render (scene, region, full) {
+function render (scene, region, full, id) {
   const buffer = new ArrayBuffer(region.width * region.height * 4);
   const data = new Uint32Array(buffer);
 
-  const aperture = 800;
+  const aperture = 1200;
   const origin = new Vector(0, 0, -aperture);
 
+  const totalPixels = region.width * region.height;
+  let pixelsDone = 0;
   for (let y = region.top; y < region.top + region.height; ++y) {
     for (let x = region.left; x < region.left + region.width; ++x) {
       const direction = new Vector(
@@ -130,6 +132,11 @@ function render (scene, region, full) {
 
       data[(y - region.top) * region.width + (x - region.left)] =
         result.color.hex();
+      pixelsDone++;
+
+      if (!(pixelsDone % 100)) {
+        postMessage({progress: {total: totalPixels, done: pixelsDone}, id});
+      }
     }
   }
   postMessage({frame: buffer, region}, [buffer]);
