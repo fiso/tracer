@@ -36,7 +36,8 @@ onmessage = function (e) {
     }
 
     const r = 800;
-    const R = [0, Math.PI * 2 / 3 * 2, Math.PI * 2 / 3];
+    const rot = .5;
+    const R = [rot, rot + Math.PI * 2 / 3 * 2, rot + Math.PI * 2 / 3];
     scene.renderables.push(new Triangle(
       new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 1000, {u: 1, v: 1}),
       new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 1000, {u: 0, v: 1}),

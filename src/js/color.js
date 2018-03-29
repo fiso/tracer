@@ -14,7 +14,7 @@ Color.from = function (c) {
     (c & 0xff) / 255,
     (c >> 8 & 0xff) / 255,
     (c >> 16 & 0xff) / 255,
-    1,
+    (c >> 24 & 0xff) / 255,
   );
 };
 
