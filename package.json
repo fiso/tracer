@@ -11,7 +11,7 @@
   },
   "scripts": {
     "clean": "rm -Rf build/ && mkdir build",
-    "build": "npm run clean && npm version patch && NODE_ENV=production webpack",
+    "build": "npm run clean && npm version patch && NODE_ENV=development webpack",
     "dev": "npm run clean && NODE_ENV=development concurrently --kill-others 'serve build/' 'webpack --watch --progress'",
     "fix-permissions": "chmod -R ugo+r *",
     "deploy-stage": "npm run build && npm run fix-permissions && rsync -a ./build/ ubuntu@stage.studioakademi.com:/var/www/tracer.stage.studioakademi.com/",
