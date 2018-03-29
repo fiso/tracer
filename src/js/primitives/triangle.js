@@ -1,5 +1,4 @@
 import {TraceResult} from '../raytracer';
-import {Vector} from '../vector';
 
 export function Triangle (a, b, c, material) {
   this.__typeOf = this.constructor.name;
@@ -25,34 +24,19 @@ Triangle.prototype.getNormal = function (p) {
   return this.normal;
 };
 
-function sortBy (array, field) {
-  return array.sort((a, b) => {
-    if (a[field] < b[field]) {
-      return -1;
-    }
-    if (a[field] > b[field]) {
-      return 1;
-    }
-    return 0;
-  });
-}
+Triangle.prototype.getUV = function (f) {
+  const f1 = this.a.subtract(f);
+  const f2 = this.b.subtract(f);
+  const f3 = this.c.subtract(f);
 
-Triangle.prototype.getUV = function (p) {
-  const xSort = sortBy([this.a, this.b, this.c], 'x');
-  const left = xSort[0];
-  const right = xSort[2];
-  const ySort = sortBy([this.a, this.b, this.c], 'y');
-  const top = ySort[0];
-  const bottom = ySort[2];
-  const width = right.x - left.x;
-  const height = bottom.y - top.y;
-  const relativePoint = p.subtract(new Vector(left.x, top.y, 0));
-  const du = right.u - left.u;
-  const dv = bottom.v - top.v;
+  const a = this.a.subtract(this.b).cross(this.a.subtract(this.c)).length();
+  const a1 = f2.cross(f3).length() / a;
+  const a2 = f3.cross(f1).length() / a;
+  const a3 = f1.cross(f2).length() / a;
 
   return {
-    u: left.u + relativePoint.x / width * du,
-    v: top.v + relativePoint.y / height * dv,
+    u: this.a.u * a1 + this.b.u * a2 + this.c.u * a3,
+    v: this.a.v * a1 + this.b.v * a2 + this.c.v * a3,
   };
 };
 

@@ -22,8 +22,7 @@ documentReady(async () => {
   statusElement = document.createElement('div');
   document.body.appendChild(statusElement);
 
-  const scene = await constructScene();
-  render(scene);
+  render(await constructScene());
 });
 
 window.constructScene = constructScene;
@@ -75,15 +74,9 @@ function preloadTextures (sources) {
   });
 }
 
-function getContext () {
-  return document.querySelector('canvas').getContext('2d');
-}
-
 function setStatus (text) {
   statusElement.innerHTML = text;
 }
-
-const frames = [];
 
 function imagedataToImage (imagedata) {
   const canvas = document.createElement('canvas');
@@ -97,84 +90,61 @@ function imagedataToImage (imagedata) {
 }
 
 function render (scene) {
-  const nThreads = navigator.hardwareConcurrency;
-  const canvas = document.querySelector('canvas');
-  const context = canvas.getContext('2d');
-  const superSampling = 2;
-  const w = canvas.width * superSampling;
-  const h = canvas.height * superSampling;
+  return new Promise((resolve, reject) => {
+    const nThreads = navigator.hardwareConcurrency;
+    const canvas = document.querySelector('canvas');
+    const context = canvas.getContext('2d');
+    const superSampling = 2;
+    const w = canvas.width * superSampling;
+    const h = canvas.height * superSampling;
 
-  let nCompleted = 0;
-  const start = performance.now();
-  const progress = {};
-  for (let i = 0; i < nThreads; i++) {
-    const worker = new RenderWorker();
-    worker.addEventListener('message', function (event) {
-      if (event.data.progress) {
-        const totalPixels = w * h;
-        progress[event.data.id] = event.data.progress.done;
-        if (Object.keys(progress).length === nThreads) {
-          const done = Object.values(progress).reduce((acc, val) => acc + val);
-          setStatus(`${Math.round(done / totalPixels * 100)}%`);
+    let nCompleted = 0;
+    const start = performance.now();
+    const progress = {};
+    for (let i = 0; i < nThreads; i++) {
+      const worker = new RenderWorker();
+      worker.addEventListener('message', function (event) {
+        if (event.data.progress) {
+          const totalPixels = w * h;
+          progress[event.data.id] = event.data.progress.done;
+          if (Object.keys(progress).length === nThreads) {
+            const done = Object.values(progress)
+              .reduce((acc, val) => acc + val);
+            setStatus(`${Math.round(done / totalPixels * 100)}%`);
+          }
+        } else if (event.data.frame) {
+          const end = performance.now();
+          const frame = new ImageData(new Uint8ClampedArray(event.data.frame),
+            event.data.region.width, event.data.region.height);
+          const img = imagedataToImage(frame);
+          img.addEventListener('load', () => {
+            context.drawImage(img, 0,
+              Math.floor(h / superSampling / nThreads * i), canvas.width,
+              event.data.region.height / superSampling);
+          });
+          nCompleted++;
+          if (nCompleted === nThreads) {
+            canvas.style.opacity = 1;
+            setStatus(`${Math.round(end - start)} ms`);
+            resolve();
+          }
         }
-      } else if (event.data.frame) {
-        const end = performance.now();
-        const frame = new ImageData(new Uint8ClampedArray(event.data.frame),
-          event.data.region.width, event.data.region.height);
-        const img = imagedataToImage(frame);
-        img.addEventListener('load', () => {
-          context.drawImage(img, 0,
-            Math.floor(h / superSampling / nThreads * i), canvas.width,
-            event.data.region.height / superSampling);
-        });
-        nCompleted++;
-        if (nCompleted === nThreads) {
-          canvas.style.opacity = 1;
-          setStatus(`${Math.round(end - start)} ms`);
-        }
-        frames.push(frame);
-      }
-    });
+      });
 
-    worker.postMessage({
-      command: 'render',
-      id: i,
-      scene,
-      region: {
-        left: 0,
-        top: Math.floor(i * (h / nThreads)),
-        width: w,
-        height: Math.ceil(h / nThreads),
-      },
-      full: {
-        w, h,
-      },
-    }); // , scene.textures.map((t) => t.data.buffer)
-  }
-}
-
-function preRender () {
-  const step = Math.PI * 2 / 60;
-  for (let r = 0; r < 2 * Math.PI; r += step) {
-    render(r);
-    console.log(
-      `Prerendering frames... ${Math.round(100 * (r / (Math.PI * 2)))}%`);
-  }
-}
-
-window.preRender = preRender;
-window.play = play;
-window.frames = frames;
-
-function play () {
-  const context = getContext();
-  for (let i = 0; i < window.frames.length; i++) {
-    const frame = window.frames[i];
-    setTimeout(() => {
-      context.putImageData(frame, 0, 0);
-      if (i >= window.frames.length - 1) {
-        play();
-      }
-    }, i * 20);
-  }
+      worker.postMessage({
+        command: 'render',
+        id: i,
+        scene,
+        region: {
+          left: 0,
+          top: Math.floor(i * (h / nThreads)),
+          width: w,
+          height: Math.ceil(h / nThreads),
+        },
+        full: {
+          w, h,
+        },
+      }); // , scene.textures.map((t) => t.data.buffer)
+    }
+  });
 }
