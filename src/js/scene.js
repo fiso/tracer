@@ -1,5 +1,6 @@
 import {Sphere} from './primitives/sphere';
 import {Triangle} from './primitives/triangle';
+import {Plane} from './primitives/plane';
 import {Cube} from './primitives/cube';
 import {Color} from './color';
 import {Vector} from './vector';
@@ -20,6 +21,7 @@ const prototypeLookup = {
   'Sphere': Sphere.prototype,
   'Cube': Cube.prototype,
   'Triangle': Triangle.prototype,
+  'Plane': Plane.prototype,
   'Color': Color.prototype,
   'Vector': Vector.prototype,
   'Vertex': Vertex.prototype,

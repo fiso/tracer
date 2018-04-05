@@ -2,6 +2,7 @@ import RenderWorker from './render.worker.js';
 import {Color} from './color';
 import {Texture} from './texture';
 import {Sphere} from './primitives/sphere';
+import {Plane} from './primitives/plane';
 import {Vertex} from './vertex';
 import {Triangle} from './primitives/triangle';
 import {Material} from './material';
@@ -31,8 +32,8 @@ window.render = render;
 async function constructScene (rotation = 0) {
   const scene = new Scene();
   scene.textures = await preloadTextures(['/img/horsey.jpg']);
-  scene.lights.push(new PointLight(new Vector(400, 0, -800)));
-  scene.lights.push(new PointLight(new Vector(-400, 0, -800)));
+  scene.lights.push(new PointLight(new Vector(400, 0, -1000)));
+  scene.lights.push(new PointLight(new Vector(-400, 0, -1000)));
   for (let x = -400; x <= 400; x += 400) {
     for (let y = -400; y <= 400; y += 800) {
       for (let z = -800; z <= 800; z += 400) {
@@ -48,6 +49,17 @@ async function constructScene (rotation = 0) {
       }
     }
   }
+
+  scene.renderables.push(new Plane(
+    new Vector(0, -1, 0),
+    800,
+    new Material({
+      color: new Color(1, 1, 1, 1),
+      reflectivity: 0,
+      diffuse: 1,
+    })
+  ));
+
   const r = 800;
   const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
     rotation + Math.PI * 2 / 3];
