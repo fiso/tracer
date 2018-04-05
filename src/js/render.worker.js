@@ -14,14 +14,15 @@ onmessage = function (e) {
 };
 
 function traceDepth (scene, ray) {
+  let closest = Number.MAX_SAFE_INTEGER;
   for (const object of scene.renderables) {
-    const intersection = object.intersect(ray, Number.MAX_SAFE_INTEGER);
+    const intersection = object.intersect(ray, closest);
     if (intersection.result === TraceResult.TR_HIT) {
-      return intersection.distance;
+      closest = intersection.distance;
     }
   }
 
-  return Number.MAX_SAFE_INTEGER;
+  return closest;
 }
 
 function raytrace (scene, params) {
