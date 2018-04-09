@@ -156,7 +156,7 @@ function render (scene) {
         full: {
           w, h,
         },
-      }); // , scene.textures.map((t) => t.data.buffer)
+      }); // }, scene.textures.map((t) => t.data.buffer));
     }
   });
 }
