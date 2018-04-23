@@ -38,5 +38,8 @@
     "svgo": "^1.0.4",
     "webpack": "^3.11.0",
     "worker-loader": "^1.1.1"
+  },
+  "dependencies": {
+    "gl-matrix": "^2.4.0"
   }
 }
