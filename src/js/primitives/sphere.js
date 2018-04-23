@@ -17,6 +17,25 @@ Sphere.prototype.getNormal = function (p) {
   return p.subtract(this.center).unit();
 };
 
+Sphere.prototype.intersect2 = function (ray, distance) {
+  const offset = ray.origin.subtract(this.center);
+  const a = ray.direction.dot(ray.direction);
+  const b = 2 * ray.direction.dot(offset);
+  const c = offset.dot(offset) - this.radius * this.radius;
+  const discriminant = b * b - 4 * a * c;
+
+  if (discriminant > 0) {
+    const t = (-b - Math.sqrt(discriminant)) / (2 * a);
+    if (t < distance) {
+      const pi = ray.origin.add(ray.direction.multiply(t));
+      return {result: TraceResult.TR_HIT, distance: t,
+        normal: this.getNormal(pi)};
+    }
+  }
+
+  return {result: TraceResult.TR_MISS};
+};
+
 Sphere.prototype.intersect = function (ray, distance) {
   const localRayOrigin = ray.origin.subtract(this.center);
 
@@ -81,26 +100,3 @@ Sphere.prototype.intersect = function (ray, distance) {
     }
   }
 };
-
-/* eslint-disable */
-
-/*
-
-TODO: review this code and see if it's faster / better
-
-Raytracer.hitTestSphere = function(origin, ray, center, radius) {
-  var offset = origin.subtract(center);
-  var a = ray.dot(ray);
-  var b = 2 * ray.dot(offset);
-  var c = offset.dot(offset) - radius * radius;
-  var discriminant = b * b - 4 * a * c;
-
-  if (discriminant > 0) {
-    var t = (-b - Math.sqrt(discriminant)) / (2 * a), hit = origin.add(ray.multiply(t));
-    return new HitTest(t, hit, hit.subtract(center).divide(radius));
-  }
-
-  return null;
-};
-
-*/
