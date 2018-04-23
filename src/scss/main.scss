@@ -21,10 +21,24 @@ body {
   background-color: #111118;
 }
 
+.render-container {
+  position: relative;
+}
+
 canvas {
   margin-bottom: 1em;
-  opacity: 0;
   transition: opacity 300ms ease-in-out;
+
+  &:not(.gl) {
+    opacity: 0;
+  }
+
+  &.gl {
+    opacity: .5;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 }
 
 img {

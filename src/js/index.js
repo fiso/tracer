@@ -16,10 +16,17 @@ import '../scss/main.scss';
 let statusElement = null;
 
 documentReady(async () => {
+  const container = document.querySelector('.render-container');
   const canvas = document.createElement('canvas');
   canvas.width = window.innerWidth - 100;
   canvas.height = canvas.width / 16 * 9;
-  document.body.appendChild(canvas);
+  container.appendChild(canvas);
+  const glCanvas = document.createElement('canvas');
+  glCanvas.width = canvas.width;
+  glCanvas.height = canvas.height;
+  glCanvas.classList.add('gl');
+  window.gl = glCanvas.getContext('webgl');
+  container.appendChild(glCanvas);
   statusElement = document.createElement('div');
   document.body.appendChild(statusElement);
 
