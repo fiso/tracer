@@ -1,8 +1,8 @@
 {
-  "name": "webtemplate",
+  "name": "tracer",
   "version": "2.0.16",
-  "description": "Akademi webpage template",
-  "author": "Akademi™",
+  "description": "A JavaScript raytracer",
+  "author": "Filip Haglund",
   "private": true,
   "license": "UNLICENSED",
   "main": "index.js",
@@ -13,8 +13,6 @@
     "clean": "rm -Rf build/ && mkdir build",
     "build": "npm run clean && npm version patch && NODE_ENV=development webpack",
     "dev": "npm run clean && NODE_ENV=development concurrently --kill-others 'serve build/' 'webpack --watch --progress'",
-    "fix-permissions": "chmod -R ugo+r *",
-    "deploy-stage": "npm run build && npm run fix-permissions && rsync -a ./build/ ubuntu@stage.studioakademi.com:/var/www/tracer.stage.studioakademi.com/",
     "svgo": "find src/assets/img -name '*.svg' -type f -exec npx svgo {} \\;"
   },
   "devDependencies": {
