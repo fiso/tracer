@@ -9,7 +9,7 @@ import {Material} from './material';
 import {Scene} from './scene';
 import {Vector} from './vector';
 import {PointLight} from './lights';
-import {documentReady} from './akademi';
+import {documentReady} from './domutils';
 import 'babel-polyfill';
 import '../scss/main.scss';
 
