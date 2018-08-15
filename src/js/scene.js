@@ -1,3 +1,4 @@
+import assert from 'assert';
 import {Sphere} from './primitives/sphere';
 import {Triangle} from './primitives/triangle';
 import {Plane} from './primitives/plane';
@@ -16,27 +17,29 @@ export function Scene () {
 }
 
 const prototypeLookup = {
-  'Object': Object.prototype,
-  'PointLight': PointLight.prototype,
-  'Sphere': Sphere.prototype,
-  'Cube': Cube.prototype,
-  'Triangle': Triangle.prototype,
-  'Plane': Plane.prototype,
-  'Color': Color.prototype,
-  'Vector': Vector.prototype,
-  'Vertex': Vertex.prototype,
-  'Material': Material.prototype,
+  Object: Object.prototype,
+  PointLight: PointLight.prototype,
+  Sphere: Sphere.prototype,
+  Cube: Cube.prototype,
+  Triangle: Triangle.prototype,
+  Plane: Plane.prototype,
+  Color: Color.prototype,
+  Vector: Vector.prototype,
+  Vertex: Vertex.prototype,
+  Material: Material.prototype,
 };
 
 Scene.deserialize = function (s) {
   Object.setPrototypeOf(s, Scene.prototype);
 
   for (const light of s.lights) {
+    assert(prototypeLookup[light.__typeOf]);
     Object.setPrototypeOf(light, prototypeLookup[light.__typeOf]);
     light.thaw(prototypeLookup);
   }
 
   for (const renderable of s.renderables) {
+    assert(prototypeLookup[renderable.__typeOf]);
     Object.setPrototypeOf(renderable, prototypeLookup[renderable.__typeOf]);
     renderable.thaw(prototypeLookup);
   }
