@@ -26,7 +26,6 @@ function traceDepth (scene, ray) {
 }
 
 function raytrace (scene, params) {
-  // Pixel format ABGR
   if (params.depth > params.maxTraceDepth) {
     return params;
   }
