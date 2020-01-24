@@ -83,7 +83,7 @@ function raytrace (scene, camera, params) {
       const rayDotN2 = params.ray.direction.dot(hitNormal) * 2;
       const r = params.ray.direction.subtract(hitNormal.multiply(rayDotN2));
 
-      const noiseLevel = .1;
+      const noiseLevel = 0;
       const noise = () => Math.random() * noiseLevel - .5 * noiseLevel;
       const reflectionTrace = raytrace(scene, camera, {
         ray: {

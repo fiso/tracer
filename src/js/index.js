@@ -1,20 +1,33 @@
 const {Camera} = require('./camera');
 const {Color} = require('./color');
-const {Material} = require('./material');
 const fs = require('fs');
+const {Material} = require('./material');
 const os = require('os');
+const {performance} = require('perf_hooks');
 const {Plane} = require('./primitives/plane');
 const {PointLight} = require('./lights');
 const {rand} = require('./random');
 const {Scene} = require('./scene');
 const {Sphere} = require('./primitives/sphere');
+const {Texture} = require('./texture');
+const {Triangle} = require('./primitives/triangle');
 const {Vector} = require('./vector');
+const {Vertex} = require('./vertex');
 const {Worker} = require('worker_threads');
-const {performance} = require('perf_hooks');
 const PNG = require('pngjs').PNG;
 
-function constructScene () {
+function preloadTextures (sources) {
+  return new Promise(async (resolve, reject) => {
+    resolve(await Promise.all(sources.map((src) => {
+      const t = new Texture(src);
+      return t.loading;
+    })));
+  });
+}
+
+async function constructScene () {
   const scene = new Scene();
+  scene.textures = await preloadTextures(['src/assets/img/horsey.png']);
   scene.lights.push(new PointLight(new Vector(400, 0, -1000)));
   scene.lights.push(new PointLight(new Vector(-400, 0, -1000)));
   for (let x = -400; x <= 400; x += 400) {
@@ -40,6 +53,22 @@ function constructScene () {
       color: new Color(1, 1, 1, 1),
       reflectivity: 0,
       diffuse: 1,
+    })
+  ));
+
+  const rotation = 0;
+  const r = 800;
+  const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
+    rotation + Math.PI * 2 / 3];
+  scene.renderables.push(new Triangle(
+    new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: .5, v: 1}),
+    new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 1, v: 0}),
+    new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 100, {u: 0, v: 0}),
+    new Material({
+      color: new Color(.7, 0, .6, 1),
+      reflectivity: .8,
+      diffuse: .5,
+      colorMap: scene.textures[0],
     })
   ));
 
@@ -124,7 +153,7 @@ function writePng (pixels, filename, width, height) {
 async function execute () {
   console.log('Starting render…');
   try {
-    const scene = constructScene();
+    const scene = await constructScene();
     const camera = new Camera();
     for (let frame = 0; frame < 1; frame++) {
       const pixels = await render(scene, camera);

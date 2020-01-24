@@ -8,6 +8,7 @@ const {Vector} = require('./vector');
 const {Vertex} = require('./vertex');
 const {Material} = require('./material');
 const {PointLight} = require('./lights');
+const {Texture} = require('./texture');
 
 function Scene () {
   this.__typeOf = this.constructor.name;
@@ -26,6 +27,7 @@ const prototypeLookup = {
   Color: Color.prototype,
   Vector: Vector.prototype,
   Vertex: Vertex.prototype,
+  Texture: Texture.prototype,
   Material: Material.prototype,
 };
 
