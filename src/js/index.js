@@ -1,3 +1,4 @@
+const {rand, reseed} = require('./random');
 const {Camera} = require('./camera');
 const {Color} = require('./color');
 const fs = require('fs');
@@ -6,7 +7,6 @@ const os = require('os');
 const {performance} = require('perf_hooks');
 const {Plane} = require('./primitives/plane');
 const {PointLight} = require('./lights');
-const {rand} = require('./random');
 const {Scene} = require('./scene');
 const {Sphere} = require('./primitives/sphere');
 const {Texture} = require('./texture');
@@ -25,18 +25,28 @@ function preloadTextures (sources) {
   });
 }
 
-async function constructScene () {
+async function constructScene (time) {
   const scene = new Scene();
   scene.textures = await preloadTextures(['src/assets/img/horsey.png']);
   scene.lights.push(new PointLight(new Vector(400, 0, -1000)));
   scene.lights.push(new PointLight(new Vector(-400, 0, -1000)));
+  reseed(1234);
   for (let x = -400; x <= 400; x += 400) {
-    for (let y = -400; y <= 400; y += 800) {
+    for (let y = -400; y <= 400; y += 400) {
       for (let z = -800; z <= 800; z += 400) {
+        if (x === 0 && y === 0) {
+          continue;
+        }
+
         scene.renderables.push(
-            new Sphere(new Vector(x, y, z), 100,
+            new Sphere(new Vector(x, y, z), rand() * 50 + 50,
                 new Material({
-                  color: new Color(rand(), rand(), rand(), 1),
+                  color: new Color(
+                      rand(),
+                      rand(),
+                      rand(),
+                      1,
+                  ),
                   reflectivity: .8,
                   diffuse: .6,
                 }),
@@ -56,7 +66,7 @@ async function constructScene () {
       }),
   ));
 
-  const rotation = Math.PI * .5;
+  const rotation = Math.PI * .5 + time;
   const r = 800;
   const R = [
     rotation,
@@ -132,7 +142,7 @@ function render (scene, camera) {
           pixels.set(framePixels, bytesPerPixel * w * y * superSampling);
           nCompleted++;
           if (nCompleted === nThreads) {
-            console.log(`Frame completed in ${Math.round(end - start)} ms`);
+            console.log(`\nFrame completed in ${Math.round(end - start)} ms`);
             resolve(pixels);
           }
         }
@@ -160,9 +170,9 @@ function writePng (pixels, filename, width, height) {
 async function execute () {
   console.log('Starting render…');
   try {
-    const scene = await constructScene();
     const camera = new Camera();
-    for (let frame = 0; frame < 1; frame++) {
+    for (let frame = 0; frame < 24; frame++) {
+      const scene = await constructScene(Math.PI * 2 / 24 * frame);
       const pixels = await render(scene, camera);
       writePng(pixels, `frame_${frame}.png`, w, h);
     }
