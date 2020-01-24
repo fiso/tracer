@@ -2,7 +2,7 @@ function cap (n) {
   return Math.min(Math.max(n, 0), 1);
 }
 
-export function Color (r, g, b, a) {
+function Color (r, g, b, a) {
   this.__typeOf = this.constructor.name;
   this.r = cap(r);
   this.g = cap(g);
@@ -56,4 +56,8 @@ Color.prototype.multiply = function (c) {
       cap(this.b * c),
       cap(this.a * c));
   }
+};
+
+module.exports = {
+  Color,
 };

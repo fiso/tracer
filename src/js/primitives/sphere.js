@@ -1,6 +1,6 @@
-import {TraceResult} from '../raytracer';
+const {TraceResult} = require('../raytracer');
 
-export function Sphere (center, radius, material) {
+function Sphere (center, radius, material) {
   this.__typeOf = this.constructor.name;
   this.center = center;
   this.radius = radius;
@@ -17,7 +17,7 @@ Sphere.prototype.getNormal = function (p) {
   return p.subtract(this.center).unit();
 };
 
-Sphere.prototype.intersect2 = function (ray, distance) {
+Sphere.prototype.intersect2 = function (ray, distance, camera) {
   const offset = ray.origin.subtract(this.center);
   const a = ray.direction.dot(ray.direction);
   const b = 2 * ray.direction.dot(offset);
@@ -36,7 +36,7 @@ Sphere.prototype.intersect2 = function (ray, distance) {
   return {result: TraceResult.TR_MISS};
 };
 
-Sphere.prototype.intersect = function (ray, distance) {
+Sphere.prototype.intersect = function (ray, distance, camera) {
   const localRayOrigin = ray.origin.subtract(this.center);
 
   // Compute A, B and C coefficients
@@ -99,4 +99,8 @@ Sphere.prototype.intersect = function (ray, distance) {
       return {result: TraceResult.TR_MISS};
     }
   }
+};
+
+module.exports = {
+  Sphere,
 };

@@ -1,7 +1,7 @@
-import {TraceResult} from '../raytracer';
-import {Vector} from '../vector';
+const {TraceResult} = require('../raytracer');
+const {Vector} = require('../vector');
 
-export function Cube (center, radius, material) {
+function Cube (center, radius, material) {
   this.__typeOf = this.constructor.name;
   this.center = center;
   this.radius = radius;
@@ -43,4 +43,8 @@ Cube.prototype.intersect = function (ray, distance) {
   }
 
   return {result: TraceResult.TR_MISS};
+};
+
+module.exports = {
+  Cube,
 };

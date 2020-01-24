@@ -1,10 +1,13 @@
-// https://evanw.github.io/lightgl.js/docs/vector.html
+const assert = require('assert');
+const {rand} = require('./random');
+// Based on https://evanw.github.io/lightgl.js/docs/vector.html
 
-export function Vector (x, y, z) {
-  this.__typeOf = 'Vector';
+function Vector (x, y, z, w) {
+  this.__typeOf = this.constructor.name;
   this.x = x || 0;
   this.y = y || 0;
   this.z = z || 0;
+  this.w = w || 1;
 }
 
 Vector.prototype = {
@@ -31,6 +34,17 @@ Vector.prototype = {
   multiply: function (v) {
     if (v instanceof Vector) {
       return new Vector(this.x * v.x, this.y * v.y, this.z * v.z);
+    } else if (Array.isArray(v)) {
+      // Assume this is a 4x4 matrix
+      assert(v.length === 16);
+      return new Vector(
+         /* eslint-disable no-multi-spaces */
+         v[0] * this.x +  v[1] * this.y +  v[2] * this.z +  v[3] * this.w,
+         v[4] * this.x +  v[5] * this.y +  v[6] * this.z +  v[7] * this.w,
+         v[8] * this.x +  v[9] * this.y + v[10] * this.z + v[11] * this.w,
+        v[12] * this.x + v[13] * this.y + v[14] * this.z + v[15] * this.w,
+         /* eslint-enable no-multi-spaces */
+      );
     } else {
       return new Vector(this.x * v, this.y * v, this.z * v);
     }
@@ -163,8 +177,8 @@ Vector.fromAngles = function (theta, phi) {
 };
 
 Vector.randomDirection = function () {
-  return Vector.fromAngles(Math.random() * Math.PI * 2,
-    Math.asin(Math.random() * 2 - 1));
+  return Vector.fromAngles(rand() * Math.PI * 2,
+    Math.asin(rand() * 2 - 1));
 };
 
 Vector.min = function (a, b) {
@@ -185,4 +199,8 @@ Vector.fromArray = function (a) {
 
 Vector.angleBetween = function (a, b) {
   return a.angleTo(b);
+};
+
+module.exports = {
+  Vector,
 };

@@ -1,22 +1,22 @@
-import {Vector} from './vector';
-import {Scene} from './scene';
-import {Color} from './color';
-import {TraceResult} from './raytracer';
-
+const {Vector} = require('./vector');
+const {Scene} = require('./scene');
+const {Color} = require('./color');
+const {TraceResult} = require('./raytracer');
+const {parentPort, workerData} = require('worker_threads');
 const EPSILON = .0001;
 
-onmessage = function (e) {
-  if (e.data.command === 'render') {
-    const scene = Scene.deserialize(e.data.scene);
-    scene.clearColor = new Color(0, 0, 0, 1);
-    render(scene, e.data.region, e.data.full, e.data.id);
-  }
-};
+console.log('Worker started');
 
-function traceDepth (scene, ray) {
+const scene = Scene.deserialize(workerData.scene);
+scene.clearColor = new Color(0, 0, 0, 1);
+const camera = workerData.camera;
+// console.log('Camera matrix: ', camera.matrix);
+render(scene, workerData.region, workerData.full, workerData.id, camera);
+
+function traceDepth (scene, camera, ray) {
   let closest = Number.MAX_SAFE_INTEGER;
   for (const object of scene.renderables) {
-    const intersection = object.intersect(ray, closest);
+    const intersection = object.intersect(ray, closest, camera);
     if (intersection.result === TraceResult.TR_HIT) {
       closest = intersection.distance;
     }
@@ -25,7 +25,7 @@ function traceDepth (scene, ray) {
   return closest;
 }
 
-function raytrace (scene, params) {
+function raytrace (scene, camera, params) {
   if (params.depth > params.maxTraceDepth) {
     return params;
   }
@@ -34,7 +34,7 @@ function raytrace (scene, params) {
   let hitNormal = null;
   let uv = null;
   for (const object of scene.renderables) {
-    const intersection = object.intersect(params.ray, params.distance);
+    const intersection = object.intersect(params.ray, params.distance, camera);
     if (intersection.result === TraceResult.TR_HIT) {
       params.distance = intersection.distance;
       hit = object;
@@ -51,7 +51,7 @@ function raytrace (scene, params) {
     params.ray.direction.multiply(params.distance));
   let pointLit = false;
   for (const light of scene.lights) {
-    const d = traceDepth(scene, {
+    const d = traceDepth(scene, camera, {
       origin: light.center,
       direction: pi.subtract(light.center).unit(),
     });
@@ -83,10 +83,16 @@ function raytrace (scene, params) {
       const rayDotN2 = params.ray.direction.dot(hitNormal) * 2;
       const r = params.ray.direction.subtract(hitNormal.multiply(rayDotN2));
 
-      const reflectionTrace = raytrace(scene, {
+      const noiseLevel = .1;
+      const noise = () => Math.random() * noiseLevel - .5 * noiseLevel;
+      const reflectionTrace = raytrace(scene, camera, {
         ray: {
           origin: pi.add(r.multiply(EPSILON)),
-          direction: r,
+          direction: r.add(new Vector(
+            noise(),
+            noise(),
+            noise(),
+          )).unit(),
         },
         maxTraceDepth: params.maxTraceDepth,
         color: scene.clearColor,
@@ -104,7 +110,7 @@ function raytrace (scene, params) {
   return params;
 }
 
-function render (scene, region, full, id) {
+function render (scene, region, full, id, camera) {
   const buffer = new ArrayBuffer(region.width * region.height * 4);
   const data = new Uint32Array(buffer);
 
@@ -121,23 +127,25 @@ function render (scene, region, full, id) {
         .subtract(origin)
         .unit();
 
-      const result = raytrace(scene, {
+      const result = raytrace(scene, camera, {
         ray: {
           origin, direction,
         },
         maxTraceDepth: 5,
         color: scene.clearColor,
         depth: 1,
-        distance: Number.MAX_SAFE_INTEGER});
+        distance: Number.MAX_SAFE_INTEGER,
+      });
 
       data[(y - region.top) * region.width + (x - region.left)] =
         result.color.hex();
       pixelsDone++;
 
       if (!(pixelsDone % 100)) {
-        postMessage({progress: {total: totalPixels, done: pixelsDone}, id});
+        parentPort.postMessage({
+          progress: {total: totalPixels, done: pixelsDone}, id});
       }
     }
   }
-  postMessage({frame: buffer, region}, [buffer]);
+  parentPort.postMessage({frame: buffer, region}, [buffer]);
 }

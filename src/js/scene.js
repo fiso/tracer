@@ -1,15 +1,15 @@
-import assert from 'assert';
-import {Sphere} from './primitives/sphere';
-import {Triangle} from './primitives/triangle';
-import {Plane} from './primitives/plane';
-import {Cube} from './primitives/cube';
-import {Color} from './color';
-import {Vector} from './vector';
-import {Vertex} from './vertex';
-import {Material} from './material';
-import {PointLight} from './lights';
+const assert = require('assert');
+const {Sphere} = require('./primitives/sphere');
+const {Triangle} = require('./primitives/triangle');
+const {Plane} = require('./primitives/plane');
+const {Cube} = require('./primitives/cube');
+const {Color} = require('./color');
+const {Vector} = require('./vector');
+const {Vertex} = require('./vertex');
+const {Material} = require('./material');
+const {PointLight} = require('./lights');
 
-export function Scene () {
+function Scene () {
   this.__typeOf = this.constructor.name;
   this.lights = [];
   this.renderables = [];
@@ -45,4 +45,8 @@ Scene.deserialize = function (s) {
   }
 
   return s;
+};
+
+module.exports = {
+  Scene,
 };
