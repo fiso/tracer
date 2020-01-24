@@ -38,12 +38,12 @@ Vector.prototype = {
       // Assume this is a 4x4 matrix
       assert(v.length === 16);
       return new Vector(
-         /* eslint-disable no-multi-spaces */
-         v[0] * this.x +  v[1] * this.y +  v[2] * this.z +  v[3] * this.w,
-         v[4] * this.x +  v[5] * this.y +  v[6] * this.z +  v[7] * this.w,
-         v[8] * this.x +  v[9] * this.y + v[10] * this.z + v[11] * this.w,
-        v[12] * this.x + v[13] * this.y + v[14] * this.z + v[15] * this.w,
-         /* eslint-enable no-multi-spaces */
+          /* eslint-disable no-multi-spaces */
+          v[0] * this.x +  v[1] * this.y +  v[2] * this.z +  v[3] * this.w,
+          v[4] * this.x +  v[5] * this.y +  v[6] * this.z +  v[7] * this.w,
+          v[8] * this.x +  v[9] * this.y + v[10] * this.z + v[11] * this.w,
+          v[12] * this.x + v[13] * this.y + v[14] * this.z + v[15] * this.w,
+          /* eslint-enable no-multi-spaces */
       );
     } else {
       return new Vector(this.x * v, this.y * v, this.z * v);
@@ -68,9 +68,9 @@ Vector.prototype = {
 
   cross: function (v) {
     return new Vector(
-      this.y * v.z - this.z * v.y,
-      this.z * v.x - this.x * v.z,
-      this.x * v.y - this.y * v.x
+        this.y * v.z - this.z * v.y,
+        this.z * v.x - this.x * v.z,
+        this.x * v.y - this.y * v.x,
     );
   },
 
@@ -173,12 +173,12 @@ Vector.unit = function (a, b) {
 
 Vector.fromAngles = function (theta, phi) {
   return new Vector(Math.cos(theta) * Math.cos(phi), Math.sin(phi),
-    Math.sin(theta) * Math.cos(phi));
+      Math.sin(theta) * Math.cos(phi));
 };
 
 Vector.randomDirection = function () {
   return Vector.fromAngles(rand() * Math.PI * 2,
-    Math.asin(rand() * 2 - 1));
+      Math.asin(rand() * 2 - 1));
 };
 
 Vector.min = function (a, b) {

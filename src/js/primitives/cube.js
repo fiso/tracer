@@ -18,9 +18,9 @@ Cube.prototype.getNormal = function (p) {
   const min = this.center.subtract(this.radius);
   const max = this.center.add(this.radius);
   return new Vector(
-    (p.x >= max.x) - (p.x <= min.x),
-    (p.y >= max.y) - (p.y <= min.y),
-    (p.z >= max.z) - (p.z <= min.z)
+      (p.x >= max.x) - (p.x <= min.x),
+      (p.y >= max.y) - (p.y <= min.y),
+      (p.z >= max.z) - (p.z <= min.z),
   );
 };
 

@@ -48,7 +48,7 @@ function raytrace (scene, camera, params) {
   }
 
   const pi = params.ray.origin.add(
-    params.ray.direction.multiply(params.distance));
+      params.ray.direction.multiply(params.distance));
   let pointLit = false;
   for (const light of scene.lights) {
     const d = traceDepth(scene, camera, {
@@ -65,7 +65,10 @@ function raytrace (scene, camera, params) {
       if (dot > 0) {
         const diff = dot * hit.material.diffuse;
         params.color = params.color.add(
-          hit.material.getColor(uv.u, uv.v).multiply(light.color).multiply(diff)
+            hit.material
+                .getColor(uv.u, uv.v)
+                .multiply(light.color)
+                .multiply(diff),
         );
       }
     }
@@ -82,9 +85,9 @@ function raytrace (scene, camera, params) {
         ray: {
           origin: pi.add(r.multiply(EPSILON)),
           direction: r.add(new Vector(
-            noise(),
-            noise(),
-            noise(),
+              noise(),
+              noise(),
+              noise(),
           )).unit(),
         },
         maxTraceDepth: params.maxTraceDepth,
@@ -95,8 +98,8 @@ function raytrace (scene, camera, params) {
 
       params.depth = reflectionTrace.depth;
       params.color = params.color.add(
-        hit.material.getColor(uv.u, uv.v).multiply(reflectionTrace.color)
-        .multiply(hit.material.reflectivity));
+          hit.material.getColor(uv.u, uv.v).multiply(reflectionTrace.color)
+              .multiply(hit.material.reflectivity));
     }
   }
 
@@ -115,10 +118,10 @@ function render (scene, region, full, id, camera) {
   for (let y = region.top; y < region.top + region.height; ++y) {
     for (let x = region.left; x < region.left + region.width; ++x) {
       const direction = new Vector(
-        x - full.w / 2,
-        y - full.h / 2, 0)
-        .subtract(origin)
-        .unit();
+          x - full.w / 2,
+          y - full.h / 2, 0)
+          .subtract(origin)
+          .unit();
 
       const result = raytrace(scene, camera, {
         ray: {

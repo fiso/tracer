@@ -15,10 +15,10 @@ Color.from = function (c) {
     return new Color(c.r, c.g, c.b, c.a);
   } else {
     return new Color(
-      (c & 0xff) / 255,
-      (c >> 8 & 0xff) / 255,
-      (c >> 16 & 0xff) / 255,
-      (c >> 24 & 0xff) / 255,
+        (c & 0xff) / 255,
+        (c >> 8 & 0xff) / 255,
+        (c >> 16 & 0xff) / 255,
+        (c >> 24 & 0xff) / 255,
     );
   }
 };
@@ -33,32 +33,32 @@ Color.prototype.hex = function () {
 Color.prototype.add = function (c) {
   if (c instanceof Color) {
     return new Color(
-      cap(this.r + c.r),
-      cap(this.g + c.g),
-      cap(this.b + c.b),
-      cap(this.a + c.a));
+        cap(this.r + c.r),
+        cap(this.g + c.g),
+        cap(this.b + c.b),
+        cap(this.a + c.a));
   } else {
     return new Color(
-      cap(this.r + c),
-      cap(this.g + c),
-      cap(this.b + c),
-      cap(this.a + c));
+        cap(this.r + c),
+        cap(this.g + c),
+        cap(this.b + c),
+        cap(this.a + c));
   }
 };
 
 Color.prototype.multiply = function (c) {
   if (c instanceof Color) {
     return new Color(
-      cap(this.r * c.r),
-      cap(this.g * c.g),
-      cap(this.b * c.b),
-      cap(this.a * c.a));
+        cap(this.r * c.r),
+        cap(this.g * c.g),
+        cap(this.b * c.b),
+        cap(this.a * c.a));
   } else {
     return new Color(
-      cap(this.r * c),
-      cap(this.g * c),
-      cap(this.b * c),
-      cap(this.a * c));
+        cap(this.r * c),
+        cap(this.g * c),
+        cap(this.b * c),
+        cap(this.a * c));
   }
 };
 

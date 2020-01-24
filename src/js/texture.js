@@ -6,7 +6,7 @@ function Texture (src) {
   this.__typeOf = this.constructor.name;
   this.loading = new Promise((resolve) => {
     fs.createReadStream(src)
-      .pipe(new PNG())
+        .pipe(new PNG())
         .on('parsed', function () {
           /* eslint-disable no-invalid-this */
           const shared = new SharedArrayBuffer(this.data.length);

@@ -34,26 +34,26 @@ async function constructScene () {
     for (let y = -400; y <= 400; y += 800) {
       for (let z = -800; z <= 800; z += 400) {
         scene.renderables.push(
-          new Sphere(new Vector(x, y, z), 100,
-            new Material({
-              color: new Color(rand(), rand(), rand(), 1),
-              reflectivity: .8,
-              diffuse: .6,
-            })
-          )
+            new Sphere(new Vector(x, y, z), 100,
+                new Material({
+                  color: new Color(rand(), rand(), rand(), 1),
+                  reflectivity: .8,
+                  diffuse: .6,
+                }),
+            ),
         );
       }
     }
   }
 
   scene.renderables.push(new Plane(
-    new Vector(0, -1, 0),
-    800,
-    new Material({
-      color: new Color(1, 1, 1, 1),
-      reflectivity: 0,
-      diffuse: 1,
-    })
+      new Vector(0, -1, 0),
+      800,
+      new Material({
+        color: new Color(1, 1, 1, 1),
+        reflectivity: 0,
+        diffuse: 1,
+      }),
   ));
 
   const rotation = Math.PI * .5;
@@ -64,15 +64,15 @@ async function constructScene () {
     rotation + Math.PI * 2 / 3,
   ];
   scene.renderables.push(new Triangle(
-    new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: .5, v: 1}),
-    new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 1, v: 0}),
-    new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 100, {u: 0, v: 0}),
-    new Material({
-      color: new Color(1, 1, 1, 1),
-      reflectivity: .8,
-      diffuse: .5,
-      colorMap: scene.textures[0],
-    })
+      new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: .5, v: 1}),
+      new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 1, v: 0}),
+      new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 100, {u: 0, v: 0}),
+      new Material({
+        color: new Color(1, 1, 1, 1),
+        reflectivity: .8,
+        diffuse: .5,
+        colorMap: scene.textures[0],
+      }),
   ));
 
   return scene;
@@ -122,7 +122,7 @@ function render (scene, camera) {
           progress[event.id] = event.progress.done;
           if (Object.keys(progress).length === nThreads) {
             const done = Object.values(progress)
-              .reduce((acc, val) => acc + val);
+                .reduce((acc, val) => acc + val);
             reportStatus(`${Math.round(done / totalPixels * 100)}%`);
           }
         } else if (event.frame) {
@@ -147,9 +147,9 @@ function reportStatus (status) {
 
 function writePng (pixels, filename, width, height) {
   const png = new PNG({
-      width,
-      height,
-      filterType: -1,
+    width,
+    height,
+    filterType: -1,
   });
 
   png.data = pixels;
