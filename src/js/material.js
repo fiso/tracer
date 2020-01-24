@@ -13,6 +13,14 @@ Material.prototype.thaw = function (prototypeLookup) {
   Object.setPrototypeOf(this.color, prototypeLookup.Color);
 };
 
+Material.prototype.getColor = function (u, v) {
+  const color = Color.from(this.color);
+  if (this.colorMap) {
+    return color.multiply(this.getColormapPixel(u, v));
+  }
+  return color;
+};
+
 Material.prototype.getColormapPixel = function (u, v) {
   const x = u * this.colorMap.w;
   const y = v * this.colorMap.h;

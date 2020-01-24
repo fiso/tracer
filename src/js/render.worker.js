@@ -64,16 +64,9 @@ function raytrace (scene, camera, params) {
       const dot = hitNormal.dot(lightVec);
       if (dot > 0) {
         const diff = dot * hit.material.diffuse;
-        if (hit.material.colorMap) {
-          params.color = params.color.add(
-            hit.material.getColormapPixel(uv.u, uv.v)
-            .multiply(light.color).multiply(diff)
-          );
-        } else {
-          params.color = params.color.add(
-            hit.material.color.multiply(light.color).multiply(diff)
-          );
-        }
+        params.color = params.color.add(
+          hit.material.getColor(uv.u, uv.v).multiply(light.color).multiply(diff)
+        );
       }
     }
   }
@@ -102,7 +95,7 @@ function raytrace (scene, camera, params) {
 
       params.depth = reflectionTrace.depth;
       params.color = params.color.add(
-        hit.material.color.multiply(reflectionTrace.color)
+        hit.material.getColor(uv.u, uv.v).multiply(reflectionTrace.color)
         .multiply(hit.material.reflectivity));
     }
   }

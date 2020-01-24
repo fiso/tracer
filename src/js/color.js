@@ -11,12 +11,16 @@ function Color (r, g, b, a) {
 }
 
 Color.from = function (c) {
-  return new Color(
-    (c & 0xff) / 255,
-    (c >> 8 & 0xff) / 255,
-    (c >> 16 & 0xff) / 255,
-    (c >> 24 & 0xff) / 255,
-  );
+  if (c instanceof Color) {
+    return new Color(c.r, c.g, c.b, c.a);
+  } else {
+    return new Color(
+      (c & 0xff) / 255,
+      (c >> 8 & 0xff) / 255,
+      (c >> 16 & 0xff) / 255,
+      (c >> 24 & 0xff) / 255,
+    );
+  }
 };
 
 Color.prototype.hex = function () {

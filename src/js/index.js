@@ -56,16 +56,19 @@ async function constructScene () {
     })
   ));
 
-  const rotation = 0;
+  const rotation = Math.PI * .5;
   const r = 800;
-  const R = [rotation, rotation + Math.PI * 2 / 3 * 2,
-    rotation + Math.PI * 2 / 3];
+  const R = [
+    rotation,
+    rotation + Math.PI * 2 / 3 * 2,
+    rotation + Math.PI * 2 / 3,
+  ];
   scene.renderables.push(new Triangle(
     new Vertex(Math.cos(R[0]) * r, Math.sin(R[0]) * r, 100, {u: .5, v: 1}),
     new Vertex(Math.cos(R[1]) * r, Math.sin(R[1]) * r, 100, {u: 1, v: 0}),
     new Vertex(Math.cos(R[2]) * r, Math.sin(R[2]) * r, 100, {u: 0, v: 0}),
     new Material({
-      color: new Color(.7, 0, .6, 1),
+      color: new Color(1, 1, 1, 1),
       reflectivity: .8,
       diffuse: .5,
       colorMap: scene.textures[0],
@@ -110,7 +113,9 @@ function render (scene, camera) {
       });
 
       worker.on('message', function (event) {
-        if (event.progress) {
+        if (event.log) {
+          console.log(event.log);
+        } else if (event.progress) {
           const totalPixels = w * h;
           progress[event.id] = event.progress.done;
           if (Object.keys(progress).length === nThreads) {
@@ -135,7 +140,7 @@ function render (scene, camera) {
 }
 
 function reportStatus (status) {
-  process.stdout.write(`\r${status}\r`);
+  process.stdout.write(`\r${status}`);
 }
 
 function writePng (pixels, filename, width, height) {
