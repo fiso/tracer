@@ -1,5 +1,9 @@
-export const TraceResult = {
+const TraceResult = {
   TR_BACKFACE: -1,
   TR_MISS: 0,
   TR_HIT: 1,
+};
+
+module.exports = {
+  TraceResult,
 };

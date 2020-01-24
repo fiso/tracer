@@ -1,6 +1,6 @@
-import {Color} from './color';
+const {Color} = require('./color');
 
-export function Material ({color, diffuse, specular, reflectivity, colorMap}) {
+function Material ({color, diffuse, specular, reflectivity, colorMap}) {
   this.__typeOf = this.constructor.name;
   this.color = color || new Color(1, 1, 1, 1);
   this.diffuse = diffuse || 1;
@@ -19,4 +19,8 @@ Material.prototype.getColormapPixel = function (u, v) {
   const pixel = this.colorMap.data[
     this.colorMap.w * Math.round(y) + Math.round(x)];
   return Color.from(pixel);
+};
+
+module.exports = {
+  Material,
 };

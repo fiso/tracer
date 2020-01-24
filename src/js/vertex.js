@@ -1,6 +1,6 @@
-import {Vector} from './vector';
+const {Vector} = require('./vector');
 
-export function Vertex (x, y, z, params) {
+function Vertex (x, y, z, params) {
   Vector.call(this, x, y, z);
   this.__typeOf = 'Vertex';
 
@@ -9,3 +9,7 @@ export function Vertex (x, y, z, params) {
 }
 
 Vertex.prototype = Vector.prototype;
+
+module.exports = {
+  Vertex,
+};

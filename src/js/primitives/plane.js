@@ -1,6 +1,6 @@
-import {TraceResult} from '../raytracer';
+const {TraceResult} = require('../raytracer');
 
-export function Plane (normal, d, material) {
+function Plane (normal, d, material) {
   this.__typeOf = this.constructor.name;
   this.normal = normal;
   this.d = d;
@@ -34,4 +34,8 @@ Plane.prototype.intersect = function (ray, distance) {
   }
 
   return {result: TraceResult.TR_MISS};
+};
+
+module.exports = {
+  Plane,
 };

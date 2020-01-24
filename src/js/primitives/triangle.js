@@ -1,6 +1,6 @@
-import {TraceResult} from '../raytracer';
+const {TraceResult} = require('../raytracer');
 
-export function Triangle (a, b, c, material) {
+function Triangle (a, b, c, material) {
   this.__typeOf = this.constructor.name;
   this.a = a;
   this.b = b;
@@ -40,15 +40,23 @@ Triangle.prototype.getUV = function (f) {
   };
 };
 
-Triangle.prototype.intersect = function (ray, distance) {
-  const ab = this.b.subtract(this.a);
-  const ac = this.c.subtract(this.a);
-  const normal = this.normal;
-  const t = normal.dot(this.a.subtract(ray.origin)) / normal.dot(ray.direction);
+Triangle.prototype.intersect = function (ray, distance, camera) {
+  const camspace = {
+    a: this.a.multiply(camera.matrix),
+    b: this.b.multiply(camera.matrix),
+    c: this.c.multiply(camera.matrix),
+    normal: this.normal.multiply(camera.matrix),
+  };
+
+  const ab = camspace.b.subtract(camspace.a);
+  const ac = camspace.c.subtract(camspace.a);
+  const normal = camspace.normal;
+  const t = normal.dot(camspace.a.subtract(ray.origin)) /
+    normal.dot(ray.direction);
 
   if (t > 0) {
     const hit = ray.origin.add(ray.direction.multiply(t));
-    const toHit = hit.subtract(this.a);
+    const toHit = hit.subtract(camspace.a);
     const dot00 = ac.dot(ac);
     const dot01 = ac.dot(ab);
     const dot02 = ac.dot(toHit);
@@ -68,4 +76,8 @@ Triangle.prototype.intersect = function (ray, distance) {
   }
 
   return {result: TraceResult.TR_MISS};
+};
+
+module.exports = {
+  Triangle,
 };
