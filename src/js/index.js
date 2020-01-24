@@ -88,7 +88,9 @@ const h = outputHeight * superSampling;
 function render (scene, camera) {
   return new Promise((resolve) => {
     const nThreads = os.cpus().length;
-    console.log(`Using ${nThreads} threads`);
+    console.log(`Using ${nThreads > 1 ?
+      `${nThreads} threads` :
+      'a single thread'}`);
     const pixels = new Uint8ClampedArray(w * h * bytesPerPixel);
 
     let nCompleted = 0;
