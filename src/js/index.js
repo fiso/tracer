@@ -31,15 +31,23 @@ async function constructScene (time) {
   scene.lights.push(new PointLight(new Vector(400, 0, -1000)));
   scene.lights.push(new PointLight(new Vector(-400, 0, -1000)));
   reseed(1234);
+  let i = 0;
   for (let x = -400; x <= 400; x += 400) {
     for (let y = -400; y <= 400; y += 400) {
       for (let z = -800; z <= 800; z += 400) {
         if (x === 0 && y === 0) {
           continue;
         }
+        i++;
 
         scene.renderables.push(
-            new Sphere(new Vector(x, y, z), rand() * 50 + 50,
+            new Sphere(
+                new Vector(
+                    x + Math.cos(time + i) * 50,
+                    y + Math.sin(time + i) * 50,
+                    z,
+                ),
+                rand() * 100 + 50,
                 new Material({
                   color: new Color(
                       rand(),
@@ -95,12 +103,8 @@ const superSampling = 2;
 const w = outputWidth * superSampling;
 const h = outputHeight * superSampling;
 
-function render (scene, camera) {
+function render (scene, camera, nThreads) {
   return new Promise((resolve) => {
-    const nThreads = os.cpus().length;
-    console.log(`Using ${nThreads > 1 ?
-      `${nThreads} threads` :
-      'a single thread'}`);
     const pixels = new Uint8ClampedArray(w * h * bytesPerPixel);
 
     let nCompleted = 0;
@@ -169,11 +173,16 @@ function writePng (pixels, filename, width, height) {
 
 async function execute () {
   console.log('Starting render…');
+  const nThreads = os.cpus().length;
+  console.log(`Using ${nThreads > 1 ?
+    `${nThreads} threads` :
+    'a single thread'}`);
   try {
+    const frames = 1;
     const camera = new Camera();
-    for (let frame = 0; frame < 24; frame++) {
-      const scene = await constructScene(Math.PI * 2 / 24 * frame);
-      const pixels = await render(scene, camera);
+    for (let frame = 0; frame < frames; frame++) {
+      const scene = await constructScene(Math.PI * 2 / frames * frame);
+      const pixels = await render(scene, camera, nThreads);
       writePng(pixels, `frame_${frame}.png`, w, h);
     }
   } catch (e) {

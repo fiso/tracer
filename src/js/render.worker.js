@@ -5,8 +5,6 @@ const {TraceResult} = require('./raytracer');
 const {parentPort, workerData} = require('worker_threads');
 const EPSILON = .0001;
 
-console.log('Worker started');
-
 const scene = Scene.deserialize(workerData.scene);
 scene.clearColor = new Color(0, 0, 0, 1);
 const camera = workerData.camera;
