@@ -11,7 +11,7 @@ const {Scene} = require('./scene');
 const {Sphere} = require('./primitives/sphere');
 const {Texture} = require('./texture');
 const {Triangle} = require('./primitives/triangle');
-const {Vector} = require('./vector');
+const {Vector} = require('./math/vector');
 const {Vertex} = require('./vertex');
 const {Worker} = require('worker_threads');
 const PNG = require('pngjs').PNG;
@@ -178,7 +178,7 @@ async function execute () {
     `${nThreads} threads` :
     'a single thread'}`);
   try {
-    const frames = 1;
+    const frames = 60;
     const camera = new Camera();
     for (let frame = 0; frame < frames; frame++) {
       const scene = await constructScene(Math.PI * 2 / frames * frame);

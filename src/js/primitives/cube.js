@@ -1,5 +1,5 @@
 const {TraceResult} = require('../raytracer');
-const {Vector} = require('../vector');
+const {Vector} = require('../math/vector');
 
 function Cube (center, radius, material) {
   this.__typeOf = this.constructor.name;

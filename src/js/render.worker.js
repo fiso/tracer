@@ -1,4 +1,4 @@
-const {Vector} = require('./vector');
+const {Vector} = require('./math/vector');
 const {Scene} = require('./scene');
 const {Color} = require('./color');
 const {TraceResult} = require('./raytracer');

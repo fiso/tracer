@@ -1,4 +1,4 @@
-const {Vector} = require('./vector');
+const {Vector} = require('./math/vector');
 
 function Vertex (x, y, z, params) {
   Vector.call(this, x, y, z);

@@ -1,5 +1,5 @@
 const assert = require('assert');
-const {rand} = require('./random');
+const {rand} = require('../random');
 // Based on https://evanw.github.io/lightgl.js/docs/vector.html
 
 function Vector (x, y, z, w) {
@@ -41,7 +41,7 @@ Vector.prototype = {
           /* eslint-disable no-multi-spaces */
           v[0] * this.x +  v[1] * this.y +  v[2] * this.z +  v[3] * this.w,
           v[4] * this.x +  v[5] * this.y +  v[6] * this.z +  v[7] * this.w,
-          v[8] * this.x +  v[9] * this.y + v[10] * this.z + v[11] * this.w,
+          v[8] * this.x +  v[9] * this.y +  v[10] * this.z + v[11] * this.w,
           v[12] * this.x + v[13] * this.y + v[14] * this.z + v[15] * this.w,
           /* eslint-enable no-multi-spaces */
       );
